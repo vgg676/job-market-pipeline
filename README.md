@@ -4,7 +4,7 @@
 
 - **技术栈**：Python 3.10+ · DeepSeek API（OpenAI 兼容）· Pandas · SQLite · Matplotlib · WordCloud · Streamlit · schedule
 - **数据规模**：岗位 5000 条 / 求职者 1000 条 / 应聘记录 3000 条（三表关联）
-- **验证环境**：Windows + Python 3.13.5（uv 虚拟环境）
+- **验证环境**：Windows + Python 3.13.5（pip + venv 虚拟环境）
 
 ## 核心亮点
 
@@ -41,11 +41,13 @@ data/applications.csv ──┘        │
 ## 快速开始
 
 ```bash
-git clone <仓库地址>
+git clone https://github.com/vgggg676/job-market-pipeline.git
 cd job-market-pipeline
-python -m venv .venv && .venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate      # Windows 激活虚拟环境（macOS/Linux 用：source .venv/bin/activate）
 pip install -r requirements.txt
-cp .env.example .env        # 在 .env 中填入 DEEPSEEK_API_KEY（或直接设置环境变量）
+copy .env.example .env      :: Windows：复制配置模板，再填入 DEEPSEEK_API_KEY
+:: macOS / Linux 用：cp .env.example .env
 
 # 放置数据：将三张原始 CSV 放入 data/（无原始数据也可先用 data/sample/ 下的脱敏样例试跑）
 python load_data.py         # step1
@@ -55,7 +57,13 @@ python visualize.py         # step4
 streamlit run app.py        # 启动仪表盘
 ```
 
-> 仅想跑通非 LLM 步骤（无原始数据 / 无 Key）时：把 `data/sample/` 下的三个文件复制到 `data/` 同名位置（注意 `candidates.csv` 已脱敏），即可从 `analyze.py` 开始执行。
+> **无原始数据 / 无 API Key 也能跑通全链路（跳过 LLM）**：把 `data/sample/` 下的四个文件复制到 `data/` 并去掉 `_sample` 后缀（即 `jobs.csv`、`candidates.csv`、`applications.csv`、`structured_jobs.csv`；其中 `candidates.csv` 的姓名已脱敏为 `求职者001` 等编号），然后执行：
+> ```bash
+> python analyze.py      # step3
+> python visualize.py    # step4
+> streamlit run app.py   # 仪表盘
+> ```
+> 这样即可跳过 step1/step2（两者都需要原始全量数据 / API Key）。
 
 ## 环境要求
 
@@ -213,7 +221,7 @@ streamlit run app.py
 
 ### applications.csv（3000 条）
 
-`application_id`, `job_id`, `candidate_id`, `skill_match_score`, `salary_match_score`, `education_match_score`, `experience_match_score`, `total_match_score`, `is_matched`(0/1), `status`（待处理/已查看/面试中/已录用/已拒绝）
+`application_id`, `job_id`, `candidate_id`, `application_date`, `skill_match_score`, `salary_match_score`, `education_match_score`, `experience_match_score`, `total_match_score`, `is_matched`(0/1), `status`（待处理/已查看/面试中/已录用/已拒绝）
 
 ## 仓库结构
 
@@ -228,6 +236,8 @@ job-market-pipeline/
 ├── app.py                 # Streamlit 交互式仪表盘
 ├── .env.example           # API Key 配置模板（复制为 .env 后填写，不入库）
 ├── requirements.txt       # 依赖清单
+├── LICENSE                # MIT 许可证
+├── .gitignore             # 忽略规则
 ├── README.md
 ├── tests/                 # pytest 单元测试（test_safe_parse_json.py）
 ├── assets/                # 流水线产物图（入库，用于 README 展示）
@@ -239,14 +249,15 @@ job-market-pipeline/
     └── sample/            # 脱敏样例数据（入库，可直接用于非 LLM 步骤）
         ├── jobs_sample.csv
         ├── candidates_sample.csv   # 姓名已脱敏为 求职者001…
-        └── applications_sample.csv
+        ├── applications_sample.csv
+        └── structured_jobs_sample.csv
 ```
 
 ## 配置项说明（config.py）
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
-| `USE_MOCK` | `False` | 是否使用 Mock 数据（`False` = 调真实 API） |
+| `USE_MOCK` | `False` | 预留开关；**当前版本未实现 Mock 分支**，恒为真实 API 调用 |
 | `LLM_PROVIDER` | `"deepseek"` | `"deepseek"` 或 `"openai"`（切换调用的模型） |
 | `OPENAI_API_KEY` | 环境变量 | OpenAI 模式使用的 Key |
 | `DEEPSEEK_API_KEY` | 环境变量 | DeepSeek 模式使用的 Key |
@@ -283,8 +294,8 @@ LLM 调用关键参数（`extract_llm.py`）：
 ### 开发准备
 
 ```bash
-git clone <仓库地址>
-cd Project
+git clone https://github.com/vgggg676/job-market-pipeline.git
+cd job-market-pipeline
 python -m venv .venv && .venv\Scripts\activate
 pip install -r requirements.txt
 ```
@@ -300,7 +311,7 @@ pip install -r requirements.txt
 
 - 遵循 PEP 8；模块内中文注释即可，不必翻译
 - **模块命名避坑（本项目踩过的坑）**：不要与标准库/第三方库重名（如 `schedule.py`、`json.py`、`random.py`）。本项目早期模块曾为规避重名使用数字后缀命名，现已统一改为语义化命名（`load_data.py`、`extract_llm.py`、`analyze.py`、`visualize.py`、`pipeline.py`）。新增模块请直接起语义化名字（如 `pipeline.py`），不要再加无意义后缀
-- `USE_MOCK` 逻辑保留，方便无 Key 时跑通非 LLM 步骤
+- 无 API Key 时的可行路径：跳过 `extract_llm.py`，改用 `data/sample/` 下的 `structured_jobs_sample.csv`（已提供），从 `analyze.py` 开始执行
 
 ### 改动敏感区的额外要求
 
@@ -324,6 +335,7 @@ pip install -r requirements.txt
 - [ ] extract 无断点续传：5000 条跑到一半中断需从头重来（可按 `job_id` 增量补跑）
 - [ ] 词云字体路径写死 Windows，需跨平台自适应
 - [ ] `pipeline.py` 每天全量重跑 5000 条 LLM 提取，成本高，可加增量模式
+- [ ] `load_data.py` 的 `build_combined_text()` 读取了数据集中不存在的列 `job_portal`（因此 `combined_text` 每行都会多出「招聘渠道：未知」这段冗余文本）。清理该行会改变 LLM 的输入，需重跑 ② 才能让 `structured_jobs.csv` 与新输入一致，故暂缓
 
 ## 许可证
 
