@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# 密钥与环境文件（严禁提交 API Key）
+.env
+*.key
+
+# 数据与生成产物（原始数据与流水线输出不入库）
+data/*.csv
+data/*.db
+data/*.png
+data/report_*.md
+
+# 日志
+*.log
+
+# pytest
+.pytest_cache/
+
+# 文档生成产物
+*.tmp
