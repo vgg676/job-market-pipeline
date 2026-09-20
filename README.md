@@ -40,28 +40,33 @@ data/applications.csv ──┘        │
 
 ## 快速开始
 
-```bash
+```bat
 git clone https://github.com/vgggg676/job-market-pipeline.git
 cd job-market-pipeline
 python -m venv .venv
-.venv\Scripts\activate      # Windows 激活虚拟环境（macOS/Linux 用：source .venv/bin/activate）
+:: 激活虚拟环境（Windows）
+.venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env      :: Windows：复制配置模板，再填入 DEEPSEEK_API_KEY
-:: macOS / Linux 用：cp .env.example .env
-
-# 放置数据：将三张原始 CSV 放入 data/（无原始数据也可先用 data/sample/ 下的脱敏样例试跑）
-python load_data.py         # step1
-python extract_llm.py       # step2（需 API Key；无 Key 可跳过，使用已有 structured_jobs.csv）
-python analyze.py           # step3
-python visualize.py         # step4
-streamlit run app.py        # 启动仪表盘
+:: 复制配置模板，再在其中填入 DEEPSEEK_API_KEY
+copy .env.example .env
+:: 放置数据：将三张原始 CSV 放入 data/（无原始数据也可先用 data/sample/ 下的脱敏样例试跑）
+python load_data.py
+python extract_llm.py
+python analyze.py
+python visualize.py
+streamlit run app.py
 ```
 
+> **macOS / Linux 用户**：激活虚拟环境请用 `source .venv/bin/activate`；复制配置模板请用 `cp .env.example .env`；其余命令（clone / venv 创建 / pip install / python *.py / streamlit run）与上方完全相同。
+
 > **无原始数据 / 无 API Key 也能跑通全链路（跳过 LLM）**：把 `data/sample/` 下的四个文件复制到 `data/` 并去掉 `_sample` 后缀（即 `jobs.csv`、`candidates.csv`、`applications.csv`、`structured_jobs.csv`；其中 `candidates.csv` 的姓名已脱敏为 `求职者001` 等编号），然后执行：
-> ```bash
-> python analyze.py      # step3
-> python visualize.py    # step4
-> streamlit run app.py   # 仪表盘
+> ```bat
+> python analyze.py
+> :: step3
+> python visualize.py
+> :: step4
+> streamlit run app.py
+> :: 仪表盘
 > ```
 > 这样即可跳过 step1/step2（两者都需要原始全量数据 / API Key）。
 
@@ -75,7 +80,7 @@ streamlit run app.py        # 启动仪表盘
 
 ### 1. 获取代码并进入目录
 
-```bash
+```bat
 cd job-market-pipeline
 ```
 
@@ -83,25 +88,25 @@ cd job-market-pipeline
 
 任选其一：
 
-```bash
-# 方式 A：标准 venv（推荐，本项目实际使用）
+```bat
+:: 方式 A：标准 venv（推荐，本项目实际使用）
 python -m venv .venv
 .venv\Scripts\activate
 
-# 方式 B：uv（可选，更快）
+:: 方式 B：uv（可选，更快）
 uv venv
 .venv\Scripts\activate
 ```
 
 ### 3. 安装依赖
 
-```bash
+```bat
 pip install -r requirements.txt
 ```
 
 国内网络加速：
 
-```bash
+```bat
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
@@ -143,11 +148,15 @@ data/applications.csv    # 应聘数据（3000 条）
 
 ### 1. 手动执行流水线（按顺序）
 
-```bash
-python load_data.py        # step1：加载三表 + 清洗 + 生成 combined_text
-python extract_llm.py     # step2：LLM 结构化提取（5000 条，约 1-2 小时）
-python analyze.py         # step3：写入 SQLite + 多维分析，控制台输出报告
-python visualize.py       # step4：生成 4 张图表 PNG
+```bat
+python load_data.py
+:: step1：加载三表 + 清洗 + 生成 combined_text
+python extract_llm.py
+:: step2：LLM 结构化提取（5000 条，约 1-2 小时）
+python analyze.py
+:: step3：写入 SQLite + 多维分析，控制台输出报告
+python visualize.py
+:: step4：生成 4 张图表 PNG
 ```
 
 step2 的正常输出示例：
@@ -163,16 +172,16 @@ step2 的正常输出示例：
 
 ### 2. 自动化定时（可选）
 
-```bash
-python pipeline.py    # 立即完整跑一次，之后每天 08:00 自动执行
-                        # Ctrl+C 退出
+```bat
+python pipeline.py
+:: 立即完整跑一次，之后每天 08:00 自动执行；Ctrl+C 退出
 ```
 
 每次运行会额外生成当日简报 `data/report_YYYYMMDD.md`。
 
 ### 3. 启动 Streamlit 仪表盘
 
-```bash
+```bat
 streamlit run app.py
 ```
 
@@ -293,7 +302,7 @@ LLM 调用关键参数（`extract_llm.py`）：
 
 ### 开发准备
 
-```bash
+```bat
 git clone https://github.com/vgggg676/job-market-pipeline.git
 cd job-market-pipeline
 python -m venv .venv && .venv\Scripts\activate
