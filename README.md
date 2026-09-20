@@ -43,7 +43,7 @@ data/applications.csv ──┘        │
 ## 快速开始
 
 ```bat
-git clone https://github.com/vgggg676/job-market-pipeline.git
+git clone https://github.com/vgg676/job-market-pipeline.git
 cd job-market-pipeline
 python -m venv .venv
 :: 激活虚拟环境（Windows）
@@ -305,7 +305,7 @@ LLM 调用关键参数（`extract_llm.py`）：
 ### 开发准备
 
 ```bat
-git clone https://github.com/vgggg676/job-market-pipeline.git
+git clone https://github.com/vgg676/job-market-pipeline.git
 cd job-market-pipeline
 python -m venv .venv && .venv\Scripts\activate
 pip install -r requirements.txt
